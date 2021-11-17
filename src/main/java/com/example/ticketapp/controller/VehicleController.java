@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ticketapp.dto.TicketDto;
+import com.example.ticketapp.dto.VehicleDto;
 import com.example.ticketapp.entity.Route;
 import com.example.ticketapp.entity.Vehicle;
 import com.example.ticketapp.service.abstracts.VehicleService;
@@ -25,14 +26,14 @@ public class VehicleController {
 	private VehicleService vehicleService;
 	
 	@PostMapping("add")
-    public ResponseEntity<?> saveVehicle(@RequestBody Vehicle vehicle)
+    public ResponseEntity<?> saveVehicle(@RequestBody VehicleDto vehicleDto)
     {
-        return new ResponseEntity<>(this.vehicleService.addVehicle(vehicle), HttpStatus.CREATED);
+        return new ResponseEntity<>(this.vehicleService.addVehicle(vehicleDto), HttpStatus.CREATED);
     }
 	
 	@PutMapping("update")
-	public ResponseEntity<?> updateVehicle(@RequestBody Vehicle vehicle) {
-		return ResponseEntity.ok(this.vehicleService.updateVehicle(vehicle));
+	public ResponseEntity<?> updateVehicle(@RequestBody VehicleDto vehicleDto) {
+		return ResponseEntity.ok(this.vehicleService.updateVehicle(vehicleDto));
 	}
 	
 	@DeleteMapping("delete/{id}")

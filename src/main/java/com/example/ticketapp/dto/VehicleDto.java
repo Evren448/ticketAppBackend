@@ -9,5 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VehicleDto {
 	private Long id;
-	private String xx;
+	private String name;
+	private int seatingCapacity;
+	private Long routeId;
+	private String beginPoint;
+	private String endPoint;
 }

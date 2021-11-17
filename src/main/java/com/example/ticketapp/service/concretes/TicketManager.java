@@ -104,4 +104,58 @@ public class TicketManager implements TicketService {
 		
 	}
 
+	@Override
+	public List<TicketDto> getByUser_id(Long id) {
+		List<TicketDto> ticketList = new ArrayList<TicketDto>();
+		List<Ticket> items = this.ticketRepository.findUserByUser_Id(id);
+		for (Ticket item : items) {
+			TicketDto dto = new TicketDto();
+			
+			
+			
+			dto.setId(item.getId());
+			dto.setRouteId(item.getRoute().getId());
+			dto.setStatus(item.getStatus());
+			dto.setUserId(item.getUser().getId());
+			dto.setVehicleId(item.getVehicle().getId());
+			
+			User user = this.userRepository.findById(dto.getUserId()).orElse(null);
+			Route route = this.routeRepository.findById(dto.getRouteId()).orElse(null);	
+			dto.setRouteEnd(route.getEnd());
+			dto.setRouteStart(route.getBegin());
+			dto.setTicketOwner(user.getFullname());
+				
+			ticketList.add(dto);
+		}
+		return ticketList;
+	}
+
+	@Override
+	public TicketDto updateTicket(TicketDto ticket) {
+		//User tmpUser = this.userRepository.findById(ticket.getUserId()).orElse(null);
+		Ticket newTicket = new Ticket();
+		TicketDto dto = new TicketDto();
+		
+		newTicket.setStatus(ticket.getStatus());
+		newTicket.setUser(this.userRepository.findById(ticket.getUserId()).orElse(null));
+		newTicket.setId(ticket.getId());
+		newTicket.setVehicle(this.vehicleRepository.findById(ticket.getVehicleId()).orElse(null));
+		newTicket.setRoute(this.routeRepository.findById(ticket.getRouteId()).orElse(null));
+		
+		this.ticketRepository.save(newTicket);
+		
+		dto.setStatus(ticket.getStatus());
+		dto.setUserId(ticket.getUserId());
+		dto.setVehicleId(ticket.getVehicleId());
+		dto.setRouteId(ticket.getRouteId());
+		dto.setId(this.ticketRepository.getById(newTicket.getId()).getId());
+		User user = this.userRepository.findById(dto.getUserId()).orElse(null);
+		Route route = this.routeRepository.findById(dto.getRouteId()).orElse(null);	
+		dto.setRouteEnd(route.getEnd());
+		dto.setRouteStart(route.getBegin());
+		dto.setTicketOwner(user.getFullname());
+		
+		return dto;
+	}
+
 }

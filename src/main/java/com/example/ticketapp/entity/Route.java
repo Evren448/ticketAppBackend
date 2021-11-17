@@ -34,4 +34,7 @@ public class Route {
 	
 	@OneToMany(mappedBy = "route", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Ticket> ticketList;
+	
+	@OneToMany(mappedBy = "route", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Vehicle> vehicle;
 }

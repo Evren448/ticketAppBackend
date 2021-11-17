@@ -9,8 +9,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +33,13 @@ public class Vehicle {
 	@Column(name = "name")
 	private String name;
 	
+	@Column(name = "seating_capacity")
+	private int seatingCapacity;
+	
+	@ManyToOne
+    @JsonIgnore
+    private Route route;
+	   
 	@OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Ticket> ticketList;
 
