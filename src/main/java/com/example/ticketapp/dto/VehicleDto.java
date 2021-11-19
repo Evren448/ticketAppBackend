@@ -1,5 +1,9 @@
 package com.example.ticketapp.dto;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,4 +18,6 @@ public class VehicleDto {
 	private Long routeId;
 	private String beginPoint;
 	private String endPoint;
+	private int availableCapacity;
+    private Date vehicleDate;
 }

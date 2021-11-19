@@ -1,6 +1,8 @@
 package com.example.ticketapp.dto;
 
 
+import java.util.Date;
+
 import com.example.ticketapp.entity.Status;
 
 import lombok.AllArgsConstructor;
@@ -17,7 +19,14 @@ public class TicketDto {
     private Long vehicleId;
     private Long routeId;
     
+    private String vehicleName;
     private String ticketOwner;
     private String routeStart;
     private String routeEnd;
+    
+	private int seatingCapacity;
+	private int availableCapacity;
+    private Date vehicleDate;
+
+
 }

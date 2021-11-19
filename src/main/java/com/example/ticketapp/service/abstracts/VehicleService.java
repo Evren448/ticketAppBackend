@@ -13,6 +13,7 @@ public interface VehicleService {
 	Vehicle getVehicleById(Long id);
 	
 	List<VehicleDto> getVehicles();
+	List<VehicleDto> findByRoute(String start, String end);
 	
 	
 }

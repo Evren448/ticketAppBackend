@@ -72,7 +72,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 
         http.authorizeRequests()
                 .antMatchers("/api/authentication/**").permitAll()
-                .antMatchers("/api/homepage/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/homepage/**").permitAll()
+                .antMatchers("/api/homepage/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/book").permitAll()
                 .antMatchers("/api/echo/**").hasRole(Role.ADMIN.name())
                 .antMatchers("/api/admin/**").hasRole(Role.ADMIN.name())

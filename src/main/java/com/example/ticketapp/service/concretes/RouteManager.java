@@ -47,4 +47,9 @@ public class RouteManager implements RouteService {
 		
 	}
 
+	@Override
+	public Route findByRouteX(String begin, String end) {
+		return this.routeRepository.findByBeginAndEnd(begin, end);
+	}
+
 }

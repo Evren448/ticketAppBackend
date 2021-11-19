@@ -35,6 +35,8 @@ public class VehicleManager implements VehicleService {
 		newVehicle.setName(vehicleDto.getName());
 		newVehicle.setRoute(this.routeRepository.getById(vehicleDto.getRouteId()));
 		newVehicle.setSeatingCapacity(vehicleDto.getSeatingCapacity());
+		newVehicle.setVehicleDate(vehicleDto.getVehicleDate());
+		newVehicle.setAvailableCapacity(vehicleDto.getSeatingCapacity());
 		
 		this.vehicleRepository.save(newVehicle);
 	
@@ -44,6 +46,8 @@ public class VehicleManager implements VehicleService {
 		dto.setEndPoint(newVehicle.getRoute().getEnd());
 		dto.setRouteId(this.routeRepository.getById(vehicleDto.getRouteId()).getId());
 		dto.setSeatingCapacity(newVehicle.getSeatingCapacity());
+		dto.setVehicleDate(vehicleDto.getVehicleDate());
+		dto.setAvailableCapacity(vehicleDto.getSeatingCapacity());
 			
 	
 		return dto;
@@ -67,6 +71,8 @@ public class VehicleManager implements VehicleService {
 			dto.setId(vehicle.getId());
 			dto.setName(vehicle.getName());
 			dto.setSeatingCapacity(vehicle.getSeatingCapacity());
+			dto.setVehicleDate(vehicle.getVehicleDate());
+			dto.setAvailableCapacity(vehicle.getAvailableCapacity());
 			
 			Route route = this.routeRepository.getById(vehicle.getRoute().getId());
 			dto.setBeginPoint(route.getBegin());
@@ -90,6 +96,8 @@ public class VehicleManager implements VehicleService {
 		updateVehicle.setRoute(this.routeRepository.getById(vehicleDto.getRouteId()));
 		updateVehicle.setId(this.vehicleRepository.getById(vehicleDto.getId()).getId());
 		updateVehicle.setSeatingCapacity(vehicleDto.getSeatingCapacity());
+		updateVehicle.setVehicleDate(vehicleDto.getVehicleDate());
+		updateVehicle.setAvailableCapacity(vehicleDto.getSeatingCapacity());
 		
 		this.vehicleRepository.save(updateVehicle);
 	
@@ -99,6 +107,8 @@ public class VehicleManager implements VehicleService {
 		dto.setEndPoint(updateVehicle.getRoute().getEnd());
 		dto.setRouteId(this.routeRepository.getById(vehicleDto.getRouteId()).getId());
 		dto.setSeatingCapacity(updateVehicle.getSeatingCapacity());
+		dto.setVehicleDate(updateVehicle.getVehicleDate());
+		dto.setAvailableCapacity(updateVehicle.getSeatingCapacity());
 			
 	
 		return dto;
@@ -115,6 +125,35 @@ public class VehicleManager implements VehicleService {
 	public void deleteVehicle(Long id) {
 		this.vehicleRepository.deleteById(id);
 		
+	}
+
+	@Override
+	public List<VehicleDto> findByRoute(String start, String end) {
+		//Route route = this.routeRepository.findByBeginAndEnd(start, end);
+		//Vehicle vehicle = this.vehicleRepository.findRouteByRoute_Id(route.getId());
+		List<Vehicle> vehicleList = this.vehicleRepository.findByRoute_BeginAndRoute_End(start, end);
+		List<VehicleDto> dtoList = new ArrayList<VehicleDto>();
+		//VehicleDto dto = new VehicleDto();
+		
+		for (Vehicle vehicle : vehicleList) {
+			VehicleDto dto = new VehicleDto();
+			
+			dto.setId(vehicle.getId());
+			dto.setName(vehicle.getName());
+			dto.setAvailableCapacity(vehicle.getAvailableCapacity());
+			dto.setBeginPoint(vehicle.getRoute().getBegin());
+			dto.setEndPoint(vehicle.getRoute().getEnd());
+			dto.setRouteId(vehicle.getRoute().getId());
+			dto.setSeatingCapacity(vehicle.getSeatingCapacity());
+			dto.setVehicleDate(vehicle.getVehicleDate());
+
+			dtoList.add(dto);
+			
+		}
+		
+		
+		
+		return dtoList;
 	}
 
 }

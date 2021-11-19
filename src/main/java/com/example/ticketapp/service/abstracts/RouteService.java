@@ -11,4 +11,5 @@ public interface RouteService {
 	void deleteRoute(Long id);
 	Route getRouteById(Long id);
 	List<Route> getAll();
+	Route findByRouteX(String begin, String end);
 }

@@ -52,5 +52,11 @@ public class RouteController {
     {
         return new ResponseEntity<>(routeService.getRouteById(id), HttpStatus.OK);
     }
+	
+	@GetMapping("getStartEnd")
+    public ResponseEntity<?> getStartEnd(String begin, String end)
+    {
+        return new ResponseEntity<>(this.routeService.findByRouteX(begin, end), HttpStatus.OK);
+    }
 
 }

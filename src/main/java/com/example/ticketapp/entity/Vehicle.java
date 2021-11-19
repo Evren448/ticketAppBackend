@@ -1,5 +1,6 @@
 package com.example.ticketapp.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -35,6 +36,12 @@ public class Vehicle {
 	
 	@Column(name = "seating_capacity")
 	private int seatingCapacity;
+	
+	@Column(name = "available_capacity")
+	private int availableCapacity;
+	
+	@Column(name="vehicle_date")
+    private Date vehicleDate;
 	
 	@ManyToOne
     @JsonIgnore
