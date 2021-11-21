@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.ticketapp.entity.Route;
+import com.example.ticketapp.entity.User;
 import com.example.ticketapp.repository.RouteRepository;
 import com.example.ticketapp.service.abstracts.RouteService;
 
@@ -33,12 +34,13 @@ public class RouteManager implements RouteService {
 
 	@Override
 	public void deleteRoute(Long id) {
-		this.routeRepository.deleteById(id);
+		Route route = this.routeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir route yok."));
+		this.routeRepository.deleteById(route.getId());
 	}
 
 	@Override
 	public Route getRouteById(Long id) {
-		return this.routeRepository.findById(id).orElse(null);
+		return this.routeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir route yok."));
 	}
 
 	@Override

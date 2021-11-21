@@ -12,6 +12,7 @@ import com.example.ticketapp.entity.Route;
 import com.example.ticketapp.entity.Status;
 import com.example.ticketapp.entity.Ticket;
 import com.example.ticketapp.entity.User;
+import com.example.ticketapp.entity.Vehicle;
 import com.example.ticketapp.repository.RouteRepository;
 import com.example.ticketapp.repository.TicketRepository;
 import com.example.ticketapp.repository.UserRepository;
@@ -36,32 +37,36 @@ public class TicketManager implements TicketService {
 	@Override
 	public TicketDto addTicket(TicketDto ticket) {
 		
-		User tmpUser = this.userRepository.findById(ticket.getUserId()).orElse(null);
+
 		Ticket newTicket = new Ticket();
 		TicketDto dto = new TicketDto();
 		
+		User tmpUser = this.userRepository.findById(ticket.getUserId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir user yok."));
+		Vehicle tmpVehicle = this.vehicleRepository.findById(ticket.getVehicleId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir vehicle yok."));
+		Route tmpRoute = this.routeRepository.findById(ticket.getRouteId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir route yok."));
+		
 		newTicket.setStatus(Status.TAKEN);
-		newTicket.setUser(this.userRepository.findById(ticket.getUserId()).orElse(null));
-		newTicket.setVehicle(this.vehicleRepository.findById(ticket.getVehicleId()).orElse(null));
-		newTicket.setRoute(this.routeRepository.findById(ticket.getRouteId()).orElse(null));
+		newTicket.setUser(tmpUser);
+		newTicket.setVehicle(tmpVehicle);
+		newTicket.setRoute(tmpRoute);
 		if(newTicket.getVehicle().getAvailableCapacity() == 0) {
 			 throw new IllegalArgumentException("This vehicle has no available seat!");
 		}
 		newTicket.getVehicle().setAvailableCapacity(newTicket.getVehicle().getAvailableCapacity() - 1);
 		
 		
-		this.ticketRepository.save(newTicket);
+		Ticket addedTicket = this.ticketRepository.save(newTicket);
 		
 		dto.setStatus(Status.TAKEN);
-		dto.setUserId(ticket.getUserId());
-		dto.setVehicleId(ticket.getVehicleId());
-		dto.setRouteId(ticket.getRouteId());
-		dto.setId(this.ticketRepository.getById(newTicket.getId()).getId());
+		dto.setUserId(addedTicket.getUser().getId());
+		dto.setVehicleId(addedTicket.getVehicle().getId());
+		dto.setRouteId(addedTicket.getRoute().getId());
+		dto.setId(addedTicket.getId());
 				
-		dto.setAvailableCapacity(newTicket.getVehicle().getAvailableCapacity());
-		dto.setSeatingCapacity(newTicket.getVehicle().getSeatingCapacity());
-		dto.setVehicleDate(newTicket.getVehicle().getVehicleDate());
-		dto.setVehicleName(newTicket.getVehicle().getName());
+		dto.setAvailableCapacity(addedTicket.getVehicle().getAvailableCapacity());
+		dto.setSeatingCapacity(addedTicket.getVehicle().getSeatingCapacity());
+		dto.setVehicleDate(addedTicket.getVehicle().getVehicleDate());
+		dto.setVehicleName(addedTicket.getVehicle().getName());
 		
 		return dto;
 	}
@@ -70,7 +75,7 @@ public class TicketManager implements TicketService {
 	public TicketDto getTicketById(Long id) {
 		
 		TicketDto dto = new TicketDto();
-		Ticket ticket = this.ticketRepository.getById(id);
+		Ticket ticket = this.ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir ticket yok."));
 		
 		dto.setId(ticket.getId());
 		dto.setStatus(ticket.getStatus());
@@ -88,14 +93,16 @@ public class TicketManager implements TicketService {
 		
 		for (Ticket ticket : ticketList) {
 			TicketDto dto = new TicketDto();
+			
+			User user = this.userRepository.findById(ticket.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir user yok."));
+			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir route yok."));
 
 			dto.setId(ticket.getId());
 			dto.setStatus(ticket.getStatus());
 			dto.setUserId(ticket.getUser().getId());
 			dto.setVehicleId(ticket.getVehicle().getId());
 			dto.setRouteId(ticket.getRoute().getId());
-			User user = this.userRepository.findById(ticket.getUser().getId()).orElse(null);
-			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElse(null);			
+						
 			dto.setTicketOwner(user.getFullname());
 			dto.setRouteStart(route.getBegin());
 			dto.setRouteEnd(route.getEnd());
@@ -114,6 +121,7 @@ public class TicketManager implements TicketService {
 
 	@Override
 	public void deleteTicket(Long id) {
+		Ticket ticket = this.ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir ticket yok."));
 		this.ticketRepository.deleteById(id);
 		
 	}
@@ -125,13 +133,15 @@ public class TicketManager implements TicketService {
 		for (Ticket item : items) {
 			TicketDto dto = new TicketDto();
 			
+			User user = this.userRepository.findById(item.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir user yok."));
+			Route route = this.routeRepository.findById(item.getRoute().getId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir route yok."));
+			
 			dto.setId(item.getId());
 			dto.setStatus(item.getStatus());
 			dto.setUserId(item.getUser().getId());
 			dto.setVehicleId(item.getVehicle().getId());
 			dto.setRouteId(item.getRoute().getId());
-			User user = this.userRepository.findById(item.getUser().getId()).orElse(null);
-			Route route = this.routeRepository.findById(item.getRoute().getId()).orElse(null);			
+						
 			dto.setTicketOwner(user.getFullname());
 			dto.setRouteStart(route.getBegin());
 			dto.setRouteEnd(route.getEnd());
@@ -142,21 +152,6 @@ public class TicketManager implements TicketService {
 			dto.setVehicleName(item.getVehicle().getName());
 			
 			ticketList.add(dto);
-			
-			
-//			dto.setId(item.getId());
-//			dto.setRouteId(item.getRoute().getId());
-//			dto.setStatus(item.getStatus());
-//			dto.setUserId(item.getUser().getId());
-//			dto.setVehicleId(item.getVehicle().getId());
-//			
-//			User user = this.userRepository.findById(dto.getUserId()).orElse(null);
-//			Route route = this.routeRepository.findById(dto.getRouteId()).orElse(null);	
-//			dto.setRouteEnd(route.getEnd());
-//			dto.setRouteStart(route.getBegin());
-//			dto.setTicketOwner(user.getFullname());
-//				
-//			ticketList.add(dto);
 		}
 		return ticketList;
 	}
@@ -167,29 +162,33 @@ public class TicketManager implements TicketService {
 		Ticket newTicket = new Ticket();
 		TicketDto dto = new TicketDto();
 		
+		User tmpUser = this.userRepository.findById(ticket.getUserId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir user yok."));
+		Vehicle tmpVehicle = this.vehicleRepository.findById(ticket.getVehicleId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir vehicle yok."));
+		Route tmpRoute = this.routeRepository.findById(ticket.getRouteId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir route yok."));
+		
 		newTicket.setStatus(ticket.getStatus());
 		
-		newTicket.setUser(this.userRepository.findById(ticket.getUserId()).orElse(null));
+		newTicket.setUser(tmpUser);
 		newTicket.setId(ticket.getId());
-		newTicket.setVehicle(this.vehicleRepository.findById(ticket.getVehicleId()).orElse(null));
-		newTicket.setRoute(this.routeRepository.findById(ticket.getRouteId()).orElse(null));
+		newTicket.setVehicle(tmpVehicle);
+		newTicket.setRoute(tmpRoute);
 		if(ticket.getStatus().equals(Status.DELAYED) || ticket.getStatus().equals(Status.CANCALLED)) {
 			newTicket.getVehicle().setAvailableCapacity(newTicket.getVehicle().getAvailableCapacity() + 1);
 		}
-		this.ticketRepository.save(newTicket);
 		
-		dto.setStatus(ticket.getStatus());
-		dto.setUserId(ticket.getUserId());
-		dto.setVehicleId(ticket.getVehicleId());
-		dto.setRouteId(ticket.getRouteId());
-		dto.setId(this.ticketRepository.getById(newTicket.getId()).getId());
-		User user = this.userRepository.findById(dto.getUserId()).orElse(null);
-		Route route = this.routeRepository.findById(dto.getRouteId()).orElse(null);	
-		dto.setRouteEnd(route.getEnd());
-		dto.setRouteStart(route.getBegin());
-		dto.setTicketOwner(user.getFullname());
-		dto.setVehicleDate(ticket.getVehicleDate());
-		dto.setVehicleName(ticket.getVehicleName());
+		Ticket updatedTicket = this.ticketRepository.save(newTicket);
+		
+		dto.setStatus(updatedTicket.getStatus());
+		dto.setUserId(updatedTicket.getUser().getId());
+		dto.setVehicleId(updatedTicket.getVehicle().getId());
+		dto.setRouteId(updatedTicket.getRoute().getId());
+		dto.setId(updatedTicket.getId());	
+		dto.setRouteEnd(updatedTicket.getRoute().getEnd());
+		dto.setRouteStart(updatedTicket.getRoute().getBegin());
+		dto.setTicketOwner(updatedTicket.getUser().getFullname());
+		dto.setVehicleDate(updatedTicket.getVehicle().getVehicleDate());
+		dto.setVehicleName(updatedTicket.getVehicle().getName());
+		
 		return dto;
 	}
 
@@ -201,14 +200,16 @@ public class TicketManager implements TicketService {
 		
 		for (Ticket ticket : ticketList) {
 			TicketDto dto = new TicketDto();
+			
+			User user = this.userRepository.findById(ticket.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir user yok."));
+			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir route yok."));
 
 			dto.setId(ticket.getId());
 			dto.setStatus(ticket.getStatus());
 			dto.setUserId(ticket.getUser().getId());
 			dto.setVehicleId(ticket.getVehicle().getId());
 			dto.setRouteId(ticket.getRoute().getId());
-			User user = this.userRepository.findById(ticket.getUser().getId()).orElse(null);
-			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElse(null);			
+					
 			dto.setTicketOwner(user.getFullname());
 			dto.setRouteStart(route.getBegin());
 			dto.setRouteEnd(route.getEnd());
@@ -233,14 +234,17 @@ public class TicketManager implements TicketService {
 		
 		for (Ticket ticket : ticketList) {
 			TicketDto dto = new TicketDto();
+			
+			User user = this.userRepository.findById(ticket.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir user yok."));
+			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir route yok."));
+
 
 			dto.setId(ticket.getId());
 			dto.setStatus(ticket.getStatus());
 			dto.setUserId(ticket.getUser().getId());
 			dto.setVehicleId(ticket.getVehicle().getId());
 			dto.setRouteId(ticket.getRoute().getId());
-			User user = this.userRepository.findById(ticket.getUser().getId()).orElse(null);
-			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElse(null);			
+			
 			dto.setTicketOwner(user.getFullname());
 			dto.setRouteStart(route.getBegin());
 			dto.setRouteEnd(route.getEnd());
@@ -267,13 +271,16 @@ public class TicketManager implements TicketService {
 		for (Ticket ticket : ticketList) {
 			TicketDto dto = new TicketDto();
 
+			User user = this.userRepository.findById(ticket.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir user yok."));
+			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir route yok."));
+
+			
 			dto.setId(ticket.getId());
 			dto.setStatus(ticket.getStatus());
 			dto.setUserId(ticket.getUser().getId());
 			dto.setVehicleId(ticket.getVehicle().getId());
 			dto.setRouteId(ticket.getRoute().getId());
-			User user = this.userRepository.findById(ticket.getUser().getId()).orElse(null);
-			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElse(null);			
+				
 			dto.setTicketOwner(user.getFullname());
 			dto.setRouteStart(route.getBegin());
 			dto.setRouteEnd(route.getEnd());
@@ -300,13 +307,15 @@ public class TicketManager implements TicketService {
 		for (Ticket ticket : ticketList) {
 			TicketDto dto = new TicketDto();
 
+			User user = this.userRepository.findById(ticket.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir user yok."));
+			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElseThrow(() -> new IllegalArgumentException("boyle bir route yok."));
+
 			dto.setId(ticket.getId());
 			dto.setStatus(ticket.getStatus());
 			dto.setUserId(ticket.getUser().getId());
 			dto.setVehicleId(ticket.getVehicle().getId());
 			dto.setRouteId(ticket.getRoute().getId());
-			User user = this.userRepository.findById(ticket.getUser().getId()).orElse(null);
-			Route route = this.routeRepository.findById(ticket.getRoute().getId()).orElse(null);			
+					
 			dto.setTicketOwner(user.getFullname());
 			dto.setRouteStart(route.getBegin());
 			dto.setRouteEnd(route.getEnd());

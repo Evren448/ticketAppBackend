@@ -48,7 +48,8 @@ public class AdminManager implements AdminService{
 
 	@Override
 	public void deleteUserById(Long id) {
-		this.userRepository.deleteById(id);
+		User user = this.userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir kullanici yok."));
+		this.userRepository.deleteById(user.getId());
 	}
 
 	@Override
@@ -80,7 +81,8 @@ public class AdminManager implements AdminService{
 
 	@Override
 	public User getUserById(Long id) {
-		return this.userRepository.findById(id).orElse(null);
+		User user = this.userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir kullanici yok."));
+		return user;
 	}
 	
 	

@@ -26,7 +26,7 @@ public class UserManager implements UserService{
     public User saveUser(User user)
     {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.ADMIN);
+        user.setRole(Role.USER);
         user.setCreateTime(LocalDateTime.now());
 
         return userRepository.save(user);

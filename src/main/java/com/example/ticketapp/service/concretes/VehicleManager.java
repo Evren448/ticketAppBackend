@@ -32,22 +32,24 @@ public class VehicleManager implements VehicleService {
 		Vehicle newVehicle = new Vehicle();
 		VehicleDto dto = new VehicleDto();
 		
+		Route route = this.routeRepository.getById(vehicleDto.getRouteId());
+		
 		newVehicle.setName(vehicleDto.getName());
-		newVehicle.setRoute(this.routeRepository.getById(vehicleDto.getRouteId()));
+		newVehicle.setRoute(route);
 		newVehicle.setSeatingCapacity(vehicleDto.getSeatingCapacity());
 		newVehicle.setVehicleDate(vehicleDto.getVehicleDate());
 		newVehicle.setAvailableCapacity(vehicleDto.getSeatingCapacity());
 		
-		this.vehicleRepository.save(newVehicle);
+		Vehicle addedVehicle = this.vehicleRepository.save(newVehicle);
 	
-		dto.setId(this.vehicleRepository.getById(newVehicle.getId()).getId());
-		dto.setName(newVehicle.getName());
-		dto.setBeginPoint(newVehicle.getRoute().getBegin());
-		dto.setEndPoint(newVehicle.getRoute().getEnd());
-		dto.setRouteId(this.routeRepository.getById(vehicleDto.getRouteId()).getId());
-		dto.setSeatingCapacity(newVehicle.getSeatingCapacity());
-		dto.setVehicleDate(vehicleDto.getVehicleDate());
-		dto.setAvailableCapacity(vehicleDto.getSeatingCapacity());
+		dto.setId(addedVehicle.getId());
+		dto.setName(addedVehicle.getName());
+		dto.setBeginPoint(addedVehicle.getRoute().getBegin());
+		dto.setEndPoint(addedVehicle.getRoute().getEnd());
+		dto.setRouteId(addedVehicle.getRoute().getId());
+		dto.setSeatingCapacity(addedVehicle.getSeatingCapacity());
+		dto.setVehicleDate(addedVehicle.getVehicleDate());
+		dto.setAvailableCapacity(addedVehicle.getSeatingCapacity());
 			
 	
 		return dto;
@@ -56,7 +58,7 @@ public class VehicleManager implements VehicleService {
 
 	@Override
 	public Vehicle getVehicleById(Long id) {
-		return this.vehicleRepository.findById(id).orElse(null);
+		return this.vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir vehicle yok."));
 	}
 
 	@Override
@@ -92,50 +94,48 @@ public class VehicleManager implements VehicleService {
 		Vehicle updateVehicle = new Vehicle();
 		VehicleDto dto = new VehicleDto();
 		
+		Route route = this.routeRepository.findById(vehicleDto.getRouteId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir route yok."));
+		Vehicle vehicle = this.vehicleRepository.findById(vehicleDto.getId()).orElseThrow(() -> new IllegalArgumentException("Boyle bir vehicle yok."));
+		
 		updateVehicle.setName(vehicleDto.getName());
-		updateVehicle.setRoute(this.routeRepository.getById(vehicleDto.getRouteId()));
-		updateVehicle.setId(this.vehicleRepository.getById(vehicleDto.getId()).getId());
+		updateVehicle.setRoute(route);
+		updateVehicle.setId(vehicle.getId());
 		updateVehicle.setSeatingCapacity(vehicleDto.getSeatingCapacity());
 		updateVehicle.setVehicleDate(vehicleDto.getVehicleDate());
-		updateVehicle.setAvailableCapacity(vehicleDto.getSeatingCapacity());
+
+		//Todo araba yeni koltuk guncelleme.
+		updateVehicle.setAvailableCapacity(vehicle.getAvailableCapacity());
 		
-		this.vehicleRepository.save(updateVehicle);
+		Vehicle changedVehicle = this.vehicleRepository.save(updateVehicle);
 	
-		dto.setId(this.vehicleRepository.getById(updateVehicle.getId()).getId());
-		dto.setName(updateVehicle.getName());
-		dto.setBeginPoint(updateVehicle.getRoute().getBegin());
-		dto.setEndPoint(updateVehicle.getRoute().getEnd());
-		dto.setRouteId(this.routeRepository.getById(vehicleDto.getRouteId()).getId());
-		dto.setSeatingCapacity(updateVehicle.getSeatingCapacity());
-		dto.setVehicleDate(updateVehicle.getVehicleDate());
-		dto.setAvailableCapacity(updateVehicle.getSeatingCapacity());
+		dto.setId(changedVehicle.getId());
+		dto.setName(changedVehicle.getName());
+		dto.setBeginPoint(changedVehicle.getRoute().getBegin());
+		dto.setEndPoint(changedVehicle.getRoute().getEnd());
+		dto.setRouteId(route.getId());
+		dto.setSeatingCapacity(changedVehicle.getSeatingCapacity());
+		dto.setVehicleDate(changedVehicle.getVehicleDate());
+		dto.setAvailableCapacity(changedVehicle.getSeatingCapacity());
 			
-	
 		return dto;
 		
-		
-		//Vehicle updateVehicle = new Vehicle();
-		//updateVehicle.setName(vehicle.getName());
-		//updateVehicle.setId(vehicle.getId());
-		
-		//return this.vehicleRepository.save(updateVehicle);
 	}
 
 	@Override
 	public void deleteVehicle(Long id) {
-		this.vehicleRepository.deleteById(id);
+		Vehicle vehicle = this.vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Boyle bir vehicle yok."));
+		this.vehicleRepository.deleteById(vehicle.getId());
 		
 	}
 
 	@Override
 	public List<VehicleDto> findByRoute(String start, String end) {
-		//Route route = this.routeRepository.findByBeginAndEnd(start, end);
-		//Vehicle vehicle = this.vehicleRepository.findRouteByRoute_Id(route.getId());
+		
 		List<Vehicle> vehicleList = this.vehicleRepository.findByRoute_BeginAndRoute_End(start, end);
 		List<VehicleDto> dtoList = new ArrayList<VehicleDto>();
-		//VehicleDto dto = new VehicleDto();
 		
 		for (Vehicle vehicle : vehicleList) {
+			
 			VehicleDto dto = new VehicleDto();
 			
 			dto.setId(vehicle.getId());
@@ -147,12 +147,8 @@ public class VehicleManager implements VehicleService {
 			dto.setSeatingCapacity(vehicle.getSeatingCapacity());
 			dto.setVehicleDate(vehicle.getVehicleDate());
 
-			dtoList.add(dto);
-			
+			dtoList.add(dto);	
 		}
-		
-		
-		
 		return dtoList;
 	}
 

@@ -24,12 +24,13 @@ import lombok.Data;
 public class Route {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Long id;
 	
 	@Column(name = "begin")
 	private String begin;
 	
-	@Column(name = "end")
+	@Column(name = "endd")
 	private String end;
 	
 	@OneToMany(mappedBy = "route", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
