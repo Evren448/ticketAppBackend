@@ -1,0 +1,8 @@
+{
+	"name" : "ticket-app",
+	"buildpacks" : [
+		{
+			"url" : "heroku/maven"		
+		}
+	]
+}
